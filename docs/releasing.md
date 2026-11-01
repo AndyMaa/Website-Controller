@@ -5,8 +5,8 @@
 3. 确认 CI 通过后，在要发布的提交上创建并推送 `v版本号` 标签。
 
 ```sh
-git tag -a v2.2.0 -m "Website Controller 2.2.0"
-git push origin v2.2.0
+git tag -a v2.2.1 -m "Website Controller 2.2.1"
+git push origin v2.2.1
 ```
 
 Release 工作流会在 Windows、Apple 芯片 Mac 和 Intel Mac 上运行测试并打包。所有构建成功后，统一生成 SHA-256 校验文件，再创建正式 Release 并上传附件。某个构建失败时不会发布缺少平台的正式版本。

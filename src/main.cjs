@@ -108,7 +108,7 @@ function makeRuntime(site) {
   const runtime = { view, status: 'connecting', unread: null, title: '', url: site.url, source: '', matched: false, ruleError: '', lastSeen: null, baseline: {}, lastNotificationAt: 0, error: '', loginRequired: false, blocked: false, hasDraft: false, nextRefresh: Date.now() + site.refreshSeconds * 1000, failures: 0, nextRetry: 0 };
   runtimes.set(site.id, runtime);
   const contents = view.webContents;
-  runtime.network=new NetworkMonitor(contents,{
+  const networkOptions={
     pollEnabled:()=>store.data.settings.fastPolling,
     canPoll:()=>!runtime.blocked&&!runtime.loginRequired&&runtime.status==='ready',
     changed:()=>broadcast(),
@@ -119,7 +119,7 @@ function makeRuntime(site) {
       runtime.source=signal.source;runtime.matched=true;
       recordObservation(siteById(site.id),runtime,signal);broadcast();
     }
-  });
+  };
   // Keep persistent sessions separate, but use Chromium's normal UA for website compatibility.
   contents.setUserAgent(contents.getUserAgent().replace(/\sElectron\/[\d.]+/g, '').replace(/\s(?:relay-workdesk|website-controller)\/[\d.]+/gi, ''));
   if (!configuredSessions.has(contents.session)) {
@@ -143,6 +143,7 @@ function makeRuntime(site) {
   contents.on('dom-ready', () => { sendRules(siteById(site.id) || site, runtime); });
   contents.on('did-start-loading', () => { runtime.status = 'connecting'; runtime.error = ''; broadcast(); });
   contents.on('did-finish-load', () => {
+    if (contents.getURL() === 'about:blank') return;
     runtime.status = 'ready'; runtime.failures = 0; runtime.error = ''; runtime.url = contents.getURL(); runtime.title = contents.getTitle(); runtime.nextRefresh = Date.now() + (siteById(site.id)?.refreshSeconds || 0) * 1000;
     if (!runtime.connectedEvent) { runtime.connectedEvent = true; addEvent(site, 'system', '网站页面已打开', '请在网站内完成登录，并打开消息页以监测接单消息。'); }
     sendRules(siteById(site.id) || site, runtime); broadcast();
@@ -160,7 +161,13 @@ function makeRuntime(site) {
   contents.on('render-process-gone', (_event, details) => { runtime.status = 'error'; runtime.error = `页面进程已停止（${details.reason}）`; runtime.nextRetry = Date.now() + 15000; broadcast(); });
   contents.on('unresponsive', () => { runtime.status = 'stale'; runtime.error = '页面暂时未响应'; broadcast(); });
   contents.on('responsive', () => { contents.send('monitor:sample-now'); });
-  contents.loadURL(site.url).catch(() => {});
+  // Create the renderer first, then enable capture before the first real website request.
+  contents.loadURL('about:blank').then(async () => {
+    if (contents.isDestroyed() || runtimes.get(site.id) !== runtime) return;
+    runtime.network=new NetworkMonitor(contents,networkOptions);
+    await runtime.network.ready;
+    if (!contents.isDestroyed() && runtimes.get(site.id) === runtime && siteById(site.id)?.enabled) await contents.loadURL(site.url);
+  }).catch(() => {});
   broadcast(); return runtime;
 }
 function closeRuntime(id) {
@@ -181,6 +188,7 @@ function selectSite(id) {
 }
 function fromGuest(event) {
   if (!event.senderFrame || event.senderFrame !== event.sender.mainFrame) return null;
+  if (event.sender.getURL() === 'about:blank') return null;
   for (const [id, runtime] of runtimes) if (runtime.view.webContents === event.sender && !event.sender.isDestroyed()) return { site: siteById(id), runtime };
   return null;
 }

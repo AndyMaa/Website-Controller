@@ -1,5 +1,18 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');
 const {classifyPayload,decodePayload,canPoll,displayEndpoint,NetworkMonitor}=require('../src/network-monitor.cjs');
+
+test('capture readiness waits for the debugger acknowledgement before a page can navigate',async()=>{
+ let acknowledge;
+ const debuggerApi={isAttached:()=>false,attach:()=>{},on:()=>{},removeListener:()=>{},detach:()=>{},sendCommand:()=>new Promise(resolve=>{acknowledge=resolve;})};
+ const monitor=new NetworkMonitor({debugger:debuggerApi,isDestroyed:()=>false},{changed:()=>{},pollEnabled:()=>false});
+ try{let ready=false;monitor.ready.then(()=>{ready=true;});await Promise.resolve();assert.equal(ready,false);acknowledge();await monitor.ready;assert.equal(ready,true);}finally{monitor.close();}
+});
+
+test('capture setup failures release navigation and leave page monitoring available',async()=>{
+ const debuggerApi={isAttached:()=>false,attach:()=>{},on:()=>{},removeListener:()=>{},detach:()=>{},sendCommand:()=>Promise.reject(new Error('Capture unavailable'))};
+ const monitor=new NetworkMonitor({debugger:debuggerApi,isDestroyed:()=>false},{changed:()=>{},pollEnabled:()=>false});
+ try{await monitor.ready;assert.equal(monitor.snapshot().mode,'page');}finally{monitor.close();}
+});
 test('detects common unread JSON fields without counting products or history',()=>{
  for(const payload of [{data:{unreadCount:3}},{data:{totalUnread:3}},{data:{message_unread_num:'3'}},{unread:{count:3}}]) assert.equal(classifyPayload(payload,'https://site.test/api').unread,3);
  assert.equal(classifyPayload({count:23,total:80,items:[{id:1,content:'product'}]},'https://site.test/products'),null);

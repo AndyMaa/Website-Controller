@@ -14,10 +14,10 @@
 
 | 系统 | 选择 |
 | --- | --- |
-| Windows 10 / 11，64 位 | [安装版](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.0/Website-Controller-2.2.0-x64-Setup.exe) |
-| Windows，想直接运行 | [免安装版](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.0/Website-Controller-2.2.0-x64-Portable.exe) |
-| macOS 13 及以上，Apple 芯片 | [ARM64 DMG](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.0/Website-Controller-2.2.0-macOS-arm64.dmg) |
-| macOS 13 及以上，Intel 芯片 | [x64 DMG](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.0/Website-Controller-2.2.0-macOS-x64.dmg) |
+| Windows 10 / 11，64 位 | [安装版](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.1/Website-Controller-2.2.1-x64-Setup.exe) |
+| Windows，想直接运行 | [免安装版](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.1/Website-Controller-2.2.1-x64-Portable.exe) |
+| macOS 13 及以上，Apple 芯片 | [ARM64 DMG](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.1/Website-Controller-2.2.1-macOS-arm64.dmg) |
+| macOS 13 及以上，Intel 芯片 | [x64 DMG](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.1/Website-Controller-2.2.1-macOS-x64.dmg) |
 
 Mac 用户可在“关于本机”中查看芯片类型。打开 DMG 后，将应用拖到“应用程序”；Release 中也提供 ZIP 包和 SHA-256 校验文件。
 

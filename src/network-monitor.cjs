@@ -59,14 +59,14 @@ class NetworkMonitor {
   constructor(contents, options) {
     this.contents=contents; this.options=options; this.requests=new Map(); this.sockets=new Map(); this.endpoints=new Map(); this.ids=new Map();
     this.mode='discovering'; this.analyzed=0; this.lastSignalAt=0; this.processingMs=null; this.stopped=false; this.pollTimer=null; this.owned=false;
-    this.observedRequests=0;
+    this.observedRequests=0; this.ready=Promise.resolve();
     this.handler=(_e,method,params)=>this.handle(method,params).catch(error=>{if(process.env.RELAY_E2E==='1')console.error('Network monitor:',method,error.message);});
     this.detachHandler=()=>{this.mode='page'; this.options.changed();};
     try {
       if (contents.debugger.isAttached()) { this.mode='page'; return; }
       contents.debugger.attach('1.3'); this.owned=true;
       contents.debugger.on('message',this.handler); contents.debugger.on('detach',this.detachHandler);
-      contents.debugger.sendCommand('Network.enable',{maxTotalBufferSize:2097152,maxResourceBufferSize:MAX_BODY}).catch(()=>{this.mode='page';this.options.changed();});
+      this.ready=contents.debugger.sendCommand('Network.enable',{maxTotalBufferSize:2097152,maxResourceBufferSize:MAX_BODY}).catch(()=>{this.mode='page';this.options.changed();});
     } catch { this.mode='page'; }
     this.pollTimer=setInterval(()=>this.poll(),1000); this.pollTimer.unref?.();
   }
