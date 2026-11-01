@@ -1,0 +1,88 @@
+{
+  "name": "website-controller",
+  "version": "2.2.0",
+  "description": "Website Controller — 多网站消息与活动工作台",
+  "author": "AndyMaa",
+  "private": true,
+  "main": "src/main.cjs",
+  "scripts": {
+    "start": "node scripts/start.cjs",
+    "test": "node --test tests/*.test.cjs",
+    "test:e2e": "node tests/e2e.cjs",
+    "build": "electron-builder --win portable nsis",
+    "build:dir": "electron-builder --win --dir",
+    "test:network": "node tests/network-e2e.cjs",
+    "build:mac": "electron-builder --mac dmg zip",
+    "checksums": "node scripts/checksums.cjs"
+  },
+  "devDependencies": {
+    "electron": "45.1.0",
+    "electron-builder": "26.18.0",
+    "playwright-core": "1.64.1"
+  },
+  "build": {
+    "appId": "com.relay.workdesk",
+    "productName": "Website Controller",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": true
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Website Controller",
+      "installerLanguages": [
+        "zh_CN",
+        "en_US"
+      ],
+      "language": "2052",
+      "artifactName": "Website-Controller-${version}-${arch}-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "Website-Controller-${version}-${arch}-Portable.${ext}"
+    },
+    "executableName": "Website Controller",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.png",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Website-Controller-${version}-macOS-${arch}.${ext}",
+      "hardenedRuntime": true,
+      "identity": "-"
+    }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndyMaa/Website-Controller.git"
+  },
+  "homepage": "https://github.com/AndyMaa/Website-Controller",
+  "bugs": {
+    "url": "https://github.com/AndyMaa/Website-Controller/issues"
+  }
+}

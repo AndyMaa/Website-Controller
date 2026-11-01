@@ -1,0 +1,38 @@
+name: 问题反馈
+description: 程序异常、网站监听或通知问题
+title: "[问题] "
+body:
+  - type: markdown
+    attributes:
+      value: "请先确认正在使用最新版本。不要上传 Cookie、客户消息、带令牌的完整接口地址或会话文件。"
+  - type: input
+    id: version
+    attributes:
+      label: 软件版本
+      placeholder: "例如 2.2.0"
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: 系统与芯片
+      placeholder: "例如 Windows 11 x64 / macOS 15 Apple 芯片"
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: 涉及的网站
+      description: 只填网站名称或不含私人参数的域名。
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 你做了什么，实际发生了什么，原本希望发生什么？
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: 截图或其他线索
+      description: 截图前请遮住账号、客户姓名和消息正文。
