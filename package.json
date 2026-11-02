@@ -1,7 +1,7 @@
 {
   "name": "website-controller",
-  "version": "2.2.1",
-  "description": "Website Controller — 多网站消息与活动工作台",
+  "version": "2.3.0",
+  "description": "Website Controller — 多网站消息中心",
   "author": "AndyMaa",
   "private": true,
   "main": "src/main.cjs",
@@ -13,7 +13,8 @@
     "build:dir": "electron-builder --win --dir",
     "test:network": "node tests/network-e2e.cjs",
     "build:mac": "electron-builder --mac dmg zip",
-    "checksums": "node scripts/checksums.cjs"
+    "checksums": "node scripts/checksums.cjs",
+    "test:interaction": "node tests/interaction-e2e.cjs"
   },
   "devDependencies": {
     "electron": "45.1.0",

@@ -6,10 +6,13 @@ const { randomUUID } = require('node:crypto');
 const { Store, normalizeSettings, normalizeUrl, validateSite, unreadFromTitle, evaluateObservation, text } = require('./core.cjs');
 const { startDemo } = require('./demo.cjs');
 const { NetworkMonitor } = require('./network-monitor.cjs');
+const { prepareProfile } = require('./profile.cjs');
 
 const testMode = process.env.RELAY_E2E === '1' && !app.isPackaged;
-// Keep the established profile and session partitions when changing the display name.
-app.setPath('userData', testMode && process.env.RELAY_DATA_DIR ? process.env.RELAY_DATA_DIR : path.join(app.getPath('appData'), process.platform === 'win32' ? '接单台' : 'Website Controller'));
+// Acquire the existing instance lock before migrating; old and new apps cannot write together.
+const legacyName = '\u63a5\u5355\u53f0';
+const legacyPath = path.join(app.getPath('appData'), legacyName);
+app.setPath('userData', testMode && process.env.RELAY_DATA_DIR ? process.env.RELAY_DATA_DIR : process.platform === 'win32' && fs.existsSync(path.join(legacyPath, 'workspace.json')) ? legacyPath : path.join(app.getPath('appData'), process.platform === 'win32' ? '消息中心' : 'Website Controller'));
 app.setName('Website Controller');
 if (process.platform === 'win32') app.setAppUserModelId('com.relay.workdesk');
 const iconPath = path.join(__dirname, '..', 'assets', process.platform === 'win32' ? 'icon.ico' : 'icon.png');
@@ -54,13 +57,12 @@ function showApp(siteId) {
 function notify(site, event) {
   const settings = store.data.settings;
   if (settings.quiet) return;
-  if (win && !win.isDestroyed() && !win.isFocused()) win.flashFrame(true);
   if (!testMode && settings.notifications && Notification.isSupported()) {
     const notification = new Notification({ title: `${site.name} · ${event.title}`, body: event.body || '点击查看网站并处理消息', icon: iconPath, silent: !settings.sound, timeoutType: 'default' });
     liveNotifications.add(notification);
     notification.on('click', () => showApp(site.id));
     notification.on('close', () => liveNotifications.delete(notification));
-    notification.on('failed', () => { liveNotifications.delete(notification); toast('Windows 通知未能显示，请检查系统通知设置'); });
+    notification.on('failed', () => { liveNotifications.delete(notification); toast('系统通知未能显示，请检查系统通知设置'); });
     notification.show();
   }
   if (settings.sound && (testMode || !settings.notifications || !Notification.isSupported())) win?.webContents.send('desk:navigate', { sound: true });
@@ -83,12 +85,13 @@ function recordObservation(site, runtime, observation) {
 function layout() {
   for (const [id, runtime] of runtimes) {
     const visible = id === activeSite && !overlay && viewBounds && win && !win.isDestroyed() && runtime.status !== 'error';
-    runtime.view.setVisible(!!visible);
+    if (runtime.visible !== !!visible) { runtime.view.setVisible(!!visible); runtime.visible = !!visible; }
     if (visible) {
       const [width, height] = win.getContentSize();
       const x = Math.max(0, Math.min(Math.round(viewBounds.x), width - 1));
       const y = Math.max(0, Math.min(Math.round(viewBounds.y), height - 1));
-      runtime.view.setBounds({ x, y, width: Math.max(1, Math.min(Math.round(viewBounds.width), width - x)), height: Math.max(1, Math.min(Math.round(viewBounds.height), height - y)) });
+      const bounds = { x, y, width: Math.max(1, Math.min(Math.round(viewBounds.width), width - x)), height: Math.max(1, Math.min(Math.round(viewBounds.height), height - y)) };
+      if (JSON.stringify(runtime.bounds) !== JSON.stringify(bounds)) { runtime.view.setBounds(bounds); runtime.bounds = bounds; }
     }
   }
 }
@@ -350,8 +353,10 @@ ipcMain.handle('desk:action', async (event, name, payload) => {
 function updateTray() {
   if (!tray || tray.isDestroyed() || !store) return;
   const unread = store.data.events.filter(e => e.type === 'message' && !e.read).length;
-  tray.setToolTip(`Website Controller · ${unread ? `${unread} 条待处理提醒` : `${store.data.sites.filter(s => s.enabled).length} 个网站后台监测中`}`);
+  const tooltip = `Website Controller · ${unread ? `${unread} 条待处理提醒` : `${store.data.sites.filter(s => s.enabled).length} 个网站后台监测中`}`;
+  if (trayTooltip !== tooltip) { tray.setToolTip(tooltip); trayTooltip = tooltip; }
 }
+let trayTooltip = '';
 function createTray() {
   const trayImage = nativeImage.createFromPath(iconPath);
   tray = new Tray(process.platform === 'darwin' ? trayImage.resize({ width: 20, height: 20 }) : trayImage);
@@ -386,13 +391,19 @@ function createWindow() {
 const locked = testMode || app.requestSingleInstanceLock();
 if (!locked) app.quit();
 else {
+  let profileError;
+  if (!testMode) {
+    try { const directory = prepareProfile(app.getPath('appData')); fs.mkdirSync(directory, { recursive: true }); app.setPath('userData', directory); app.setPath('sessionData', directory); }
+    catch (error) { profileError = new Error(`本地数据迁移未完成：${error.message}。请退出旧版后重试，原有数据仍在原目录。`); }
+  }
   app.on('second-instance', () => showApp());
   app.on('activate', () => { if (win) showApp(); });
   app.whenReady().then(() => {
+    if (profileError) throw profileError;
     store = new Store(app.getPath('userData'));
     // Update an existing startup entry after the executable rename; retain OS-disabled state.
     if (process.platform === 'win32' && app.isPackaged && !process.env.PORTABLE_EXECUTABLE_DIR && store.data.settings.launchAtLogin) {
-      const legacyStartup = app.getLoginItemSettings({ path: path.join(path.dirname(process.execPath), '接单台.exe'), args: ['--hidden'] });
+      const legacyStartup = app.getLoginItemSettings({ path: path.join(path.dirname(process.execPath), `${legacyName}.exe`), args: ['--hidden'] });
       const legacyItem = legacyStartup.launchItems.find(item => item.name === 'com.relay.workdesk');
       if (legacyItem) app.setLoginItemSettings({ openAtLogin: true, args: ['--hidden'], enabled: legacyItem.enabled });
     }

@@ -97,7 +97,7 @@ function messagesPage() {
 }
 function settingRow(key, label, description) { return `<div class="setting-row"><div><div class="setting-label">${label}</div><div class="setting-description">${description}</div></div><button class="toggle ${state.settings[key] ? 'on' : ''}" role="switch" aria-checked="${state.settings[key]}" aria-label="${label}" data-action="setting" data-key="${key}"></button></div>`; }
 function settingsPage() {
-  return `${heading('偏好设置','设置提醒方式、后台行为与网站配置。','','PREFERENCES')}<div class="settings-grid"><div><section class="settings-card"><h2>消息与提醒</h2><p class="settings-caption">消息先汇总到本地，再按你的偏好提醒。</p>${settingRow('fastPolling','加速消息检查','对已确认的同源未读计数接口，每 3 秒检查一次；网站限流时自动退避。')}${settingRow('notifications','桌面通知','新消息变化出现时，在桌面显示提醒；点击通知可返回网站。')}${settingRow('sound','提醒声音','桌面通知使用系统提示音；关闭桌面通知时使用软件提示音。')}${settingRow('quiet','免打扰','继续监测和记录消息，暂停桌面通知、声音和任务栏闪烁。')}<div class="settings-actions">${btn('notification-test','发送测试提醒','bell','small')}</div><div class="info-line">${icon('info')}${state.notificationSupported ? '通知显示还取决于 系统通知和勿扰设置。' : '当前系统未报告桌面通知支持，消息仍会在软件中记录。'}</div></section><section class="settings-card"><h2>外观与运行方式</h2><p class="settings-caption">保持软件运行，才能继续监测网站。</p>${settingRow('darkMode','深色外观','石墨灰背景，适合夜间或长时间工作。')}${settingRow('reducedMotion','减少动态效果','关闭页面与弹窗的过渡动画。')}${settingRow('closeToTray','关闭窗口后继续运行','点击右上角关闭按钮时收起到系统托盘；从托盘菜单可以完全退出。')}${settingRow('launchAtLogin','开机启动','安装后可用；登录系统后在后台运行。')}</section><section class="settings-card"><h2>网站设置与记录</h2><p class="settings-caption">导出的设置只包含网站地址与监测规则，不包含 Cookie、登录凭据或消息记录。</p><div class="settings-actions">${btn('export','导出网站设置','download','small')}${btn('import','导入网站设置','upload','small')}${btn('clear-events','清空活动记录','trash','small')}</div></section></div><div><section class="settings-card"><div class="about-logo"><img src="../../assets/icon.svg" alt="" width="48" height="48"><div><h2>Website Controller</h2><p>多网站消息工作台 · v${e(state.version)}</p></div></div><div class="about-text">为多平台接单准备的桌面工作台。<br>打开真实网站、保留独立登录状态，<br>将分散的消息线索集中到一处。</div><span class="about-badge">${icon('shield')}本地运行 · 无需额外注册</span></section><section class="settings-card"><h2>如何获得可靠的提醒</h2><div class="about-text" style="margin-top:13px">登录后进入网站消息页，软件会自动分析实际响应，识别消息接口、WebSocket 和 SSE 推送，并监听页面变化。<br><br>“连接详情”会显示已发现的消息来源。自动识别尚未找到来源时，页面监测继续运行，也可以手动点选角标或正文。<br><br>睡眠、断网、退出软件或登录失效期间，无法接收实时提醒。依赖刷新的网站可开启定时刷新。</div></section><section class="settings-card"><h2>本地数据</h2><p class="settings-caption" style="margin-top:8px">登录状态由 Chromium 会话保存在本机；消息摘要也保存在此目录。请妥善保管。</p><div class="data-path">${e(state.dataPath)}</div>${btn('data-folder','打开数据文件夹','folder','small')}</section></div></div>`;
+  return `${heading('偏好设置','设置提醒方式、后台行为与网站配置。','','PREFERENCES')}<div class="settings-grid"><div><section class="settings-card"><h2>消息与提醒</h2><p class="settings-caption">消息先汇总到本地，再按你的偏好提醒。</p>${settingRow('fastPolling','加速消息检查','对已确认的同源未读计数接口，每 3 秒检查一次；网站限流时自动退避。')}${settingRow('notifications','桌面通知','新消息变化出现时，在桌面显示提醒；点击通知可返回网站。')}${settingRow('sound','提醒声音','桌面通知使用系统提示音；关闭桌面通知时使用软件提示音。')}${settingRow('quiet','免打扰','继续监测和记录消息，暂停桌面通知和声音。')}<div class="settings-actions">${btn('notification-test','发送测试提醒','bell','small')}</div><div class="info-line">${icon('info')}${state.notificationSupported ? '通知显示还取决于 系统通知和勿扰设置。' : '当前系统未报告桌面通知支持，消息仍会在软件中记录。'}</div></section><section class="settings-card"><h2>外观与运行方式</h2><p class="settings-caption">保持软件运行，才能继续监测网站。</p>${settingRow('darkMode','深色外观','石墨灰背景，适合夜间或长时间工作。')}${settingRow('reducedMotion','减少动态效果','关闭页面与弹窗的过渡动画。')}${settingRow('closeToTray','关闭窗口后继续运行','点击右上角关闭按钮时收起到系统托盘；从托盘菜单可以完全退出。')}${settingRow('launchAtLogin','开机启动','安装后可用；登录系统后在后台运行。')}</section><section class="settings-card"><h2>网站设置与记录</h2><p class="settings-caption">导出的设置只包含网站地址与监测规则，不包含 Cookie、登录凭据或消息记录。</p><div class="settings-actions">${btn('export','导出网站设置','download','small')}${btn('import','导入网站设置','upload','small')}${btn('clear-events','清空活动记录','trash','small')}</div></section></div><div><section class="settings-card"><div class="about-logo"><img src="../../assets/icon.svg" alt="" width="48" height="48"><div><h2>Website Controller</h2><p>多网站消息中心 · v${e(state.version)}</p></div></div><div class="about-text">为多平台接单准备的桌面工作台。<br>打开真实网站、保留独立登录状态，<br>将分散的消息线索集中到一处。</div><span class="about-badge">${icon('shield')}本地运行 · 无需额外注册</span></section><section class="settings-card"><h2>如何获得可靠的提醒</h2><div class="about-text" style="margin-top:13px">登录后进入网站消息页，软件会自动分析实际响应，识别消息接口、WebSocket 和 SSE 推送，并监听页面变化。<br><br>“连接详情”会显示已发现的消息来源。自动识别尚未找到来源时，页面监测继续运行，也可以手动点选角标或正文。<br><br>睡眠、断网、退出软件或登录失效期间，无法接收实时提醒。依赖刷新的网站可开启定时刷新。</div></section><section class="settings-card"><h2>本地数据</h2><p class="settings-caption" style="margin-top:8px">登录状态由 Chromium 会话保存在本机；消息摘要也保存在此目录。请妥善保管。</p><div class="data-path">${e(state.dataPath)}</div>${btn('data-folder','打开数据文件夹','folder','small')}</section></div></div>`;
 }
 function browserPage() {
   const site = findSite(selectedSite);
@@ -105,12 +105,15 @@ function browserPage() {
   const r = site.runtime, value = status(site);
   return `<div class="browser-heading">${avatar(site)}<div><h1>${e(site.name)}${site.demo ? '<span class="badge-demo">本地演示</span>' : ''}</h1><p>在原网站中查看与回复，工作台在后台汇总提醒。</p></div><div class="browser-heading-actions">${btn('network','连接详情','activity','small',`data-id="${e(site.id)}"`)}${btn('use-current','设为起始页','home','small',`data-id="${e(site.id)}"`)}${btn('rules','监测规则','target','small',`data-id="${e(site.id)}"`)}${ibtn('site-menu','网站设置','more',`data-id="${e(site.id)}"`)}</div></div><div class="browser-frame"><div class="browser-toolbar">${ibtn('browser-command','后退','back',`data-command="back" ${!r.canGoBack ? 'disabled' : ''}`)}${ibtn('browser-command','前进','chevron',`data-command="forward" ${!r.canGoForward ? 'disabled' : ''}`)}${ibtn('browser-command','刷新页面','reload','data-command="reload"')}${ibtn('browser-command','监测起始页','home','data-command="home"')}<form id="address-form" class="address-bar">${icon(r.url.startsWith('https:') ? 'shield' : 'globe')}<input id="address" aria-label="网站地址" spellcheck="false" value="${e(r.url || site.url)}"></form>${ibtn('browser-command','在系统浏览器中打开','external','data-command="external"')}</div><div class="browser-note ${attention(site) || !r.matched ? 'warn' : ''}">${icon(attention(site) ? 'info' : 'activity')}<span>${e(value.detail)}${site.demo ? ' 当前为本地演示，数据与真实网站无关。' : ''}</span></div><div id="browser-host" class="browser-host">${r.status === 'error' ? `<div class="empty-state">${emptyArt()}<h3>暂时无法连接到网站</h3><p>${e(r.error)}<br>可点击刷新重试，或在系统浏览器中检查。</p>${btn('browser-command','重新连接','reload','primary small','data-command="reload"')}</div>` : `<div class="empty-state"><span class="spinner"></span><p style="margin-top:15px">正在准备网站页面…</p></div>`}</div><div class="browser-status"><span>${statusBadge(site)}${r.source ? `识别来源：${e(r.source)}` : '未识别到未读数量时显示 —'}${r.hasDraft ? ' · 检测到编辑内容，已跳过自动刷新' : ''}</span><span>${r.lastSeen ? `最近心跳 ${formatTime(r.lastSeen)}` : '等待页面心跳'} · 后台持续监测</span></div></div>`;
 }
+let lastBounds = '', routeAnimation;
 function syncBounds() {
   if (page !== 'browser') return;
   const element = document.querySelector('#browser-host');
   if (!element) return;
   const bounds = element.getBoundingClientRect();
-  window.workdesk.bounds({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height });
+  const next = { x: Math.round(bounds.x), y: Math.round(bounds.y), width: Math.round(bounds.width), height: Math.round(bounds.height) };
+  const key = `${selectedSite}:${JSON.stringify(next)}`;
+  if (key !== lastBounds) { lastBounds = key; window.workdesk.bounds(next); }
 }
 function render() {
   if (!state) return;
@@ -118,25 +121,21 @@ function render() {
   document.documentElement.dataset.motion=state.settings.reducedMotion?'reduce':'full';
   const route=page==='browser'?page+selectedSite:page;
   const animateRoute=previousRoute!==route; previousRoute=route;
-  const focused = document.activeElement;
-  const focusId = focused?.id;
-  const selection = focused instanceof HTMLInputElement ? [focused.selectionStart, focused.selectionEnd, focused.value] : null;
   const scrollTop = content.scrollTop;
   renderSidebar(); renderTopbar();
   content.className = page === 'browser' ? 'browser-page' : '';
-  content.innerHTML = `${state.warning ? `<div class="warning-banner">${e(state.warning)}</div>` : ''}${page === 'dashboard' ? dashboard() : page === 'sites' ? sitesPage() : page === 'messages' ? messagesPage() : page === 'settings' ? settingsPage() : browserPage()}`;
+  updateHTML(content, `${state.warning ? `<div class="warning-banner">${e(state.warning)}</div>` : ''}${page === 'dashboard' ? dashboard() : page === 'sites' ? sitesPage() : page === 'messages' ? messagesPage() : page === 'settings' ? settingsPage() : browserPage()}`);
   content.scrollTop = scrollTop;
-  if (focusId && !modal) {
-    const replacement = document.getElementById(focusId);
-    if (replacement && replacement !== focused && selection) { replacement.value = selection[2]; replacement.focus({ preventScroll: true }); try { replacement.setSelectionRange(selection[0], selection[1]); } catch {} }
+  if (animateRoute) {
+    routeAnimation?.cancel();
+    if(page !== 'browser'&&!state.settings.reducedMotion&&!matchMedia('(prefers-reduced-motion: reduce)').matches)routeAnimation=content.animate([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:160,easing:'cubic-bezier(.22,1,.36,1)'});
   }
-  if(animateRoute&&!state.settings.reducedMotion&&!matchMedia('(prefers-reduced-motion: reduce)').matches)content.animate([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:210,easing:'cubic-bezier(.22,1,.36,1)'});
   requestAnimationFrame(syncBounds);
 }
 function requestRender() { if (!renderPending) { renderPending = true; requestAnimationFrame(() => { renderPending = false; render(); }); } }
 async function navigate(next) {
   page = next; search = ''; selectedSite = null; content.scrollTop = 0;
-  await call('navigate'); render();
+  lastBounds = ''; render(); await call('navigate');
 }
 async function openSite(id) {
   await call('select', id); selectedSite = id; page = 'browser'; search = ''; render();

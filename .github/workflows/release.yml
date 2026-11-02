@@ -39,6 +39,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run test:e2e
+      - run: npm run test:interaction
       - run: npm run test:network
       - run: ${{ matrix.command }}
       - name: Check packaged files

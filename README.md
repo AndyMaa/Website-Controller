@@ -2,7 +2,7 @@
 
 # Website Controller
 
-把多个网站放进一个桌面工作台，集中查看消息和连接状态，适合需要同时留意多个工作平台的人。
+把多个网站放进一个桌面消息中心，集中查看消息和连接状态，适合需要同时留意多个工作平台的人。
 
 每个网站使用独立的登录会话。登录后打开消息页，软件会尝试寻找未读接口和推送来源，也可以直接监听页面上的角标和消息内容。
 
@@ -14,10 +14,10 @@
 
 | 系统 | 选择 |
 | --- | --- |
-| Windows 10 / 11，64 位 | [安装版](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.1/Website-Controller-2.2.1-x64-Setup.exe) |
-| Windows，想直接运行 | [免安装版](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.1/Website-Controller-2.2.1-x64-Portable.exe) |
-| macOS 13 及以上，Apple 芯片 | [ARM64 DMG](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.1/Website-Controller-2.2.1-macOS-arm64.dmg) |
-| macOS 13 及以上，Intel 芯片 | [x64 DMG](https://github.com/AndyMaa/Website-Controller/releases/download/v2.2.1/Website-Controller-2.2.1-macOS-x64.dmg) |
+| Windows 10 / 11，64 位 | [安装版](https://github.com/AndyMaa/Website-Controller/releases/download/v2.3.0/Website-Controller-2.3.0-x64-Setup.exe) |
+| Windows，想直接运行 | [免安装版](https://github.com/AndyMaa/Website-Controller/releases/download/v2.3.0/Website-Controller-2.3.0-x64-Portable.exe) |
+| macOS 13 及以上，Apple 芯片 | [ARM64 DMG](https://github.com/AndyMaa/Website-Controller/releases/download/v2.3.0/Website-Controller-2.3.0-macOS-arm64.dmg) |
+| macOS 13 及以上，Intel 芯片 | [x64 DMG](https://github.com/AndyMaa/Website-Controller/releases/download/v2.3.0/Website-Controller-2.3.0-macOS-x64.dmg) |
 
 Mac 用户可在“关于本机”中查看芯片类型。打开 DMG 后，将应用拖到“应用程序”；Release 中也提供 ZIP 包和 SHA-256 校验文件。
 
@@ -56,12 +56,12 @@ Windows 包未做商业签名；macOS 包使用临时签名，未做 Apple 公�
 
 没有另外的云端消息服务器。网站浏览和计数检查直接连接原网站，配置与消息摘要保存在本机：
 
-- Windows 沿用旧版目录：%APPDATA%\接单台
+- Windows：%APPDATA%\消息中心
 - macOS：~/Library/Application Support/Website Controller
 
 实际路径可在设置中查看。各站点使用隔离的 Chromium 会话。导出的网站设置不包含 Cookie、登录凭据或消息记录；本地消息摘要没有额外加密，请妥善保管系统账号。
 
-Windows 下的已有网站、登录会话和消息记录会继续使用。“设为已处理”仅更新软件中的提醒，不会替你在网站上标记已读。
+升级前先从托盘退出旧版。Windows 会将旧版配置和登录会话复制到“消息中心”数据目录，保留原目录供回退使用。“设为已处理”仅更新软件中的提醒，不会替你在网站上标记已读。
 
 ## 从源码运行
 
@@ -80,6 +80,7 @@ npm start
 npm test
 npm run test:e2e
 npm run test:network
+npm run test:interaction
 npm run build       # 在 Windows 上构建 EXE
 npm run build:mac   # 在 macOS 上构建 DMG / ZIP
 ~~~

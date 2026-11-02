@@ -7,7 +7,8 @@ const { randomUUID } = require('node:crypto');
 const { validateSite, DEFAULT_SETTINGS } = require('../src/core.cjs');
 const root = path.resolve(__dirname, '..');
 const resultsDir = path.join(root, 'test-results'); fs.mkdirSync(resultsDir, { recursive: true });
-const dataDir = path.join(resultsDir, `desktop-${randomUUID()}`); fs.mkdirSync(dataDir);
+const profileRoot = path.join(resultsDir, `desktop-${randomUUID()}`);
+let dataDir = path.join(profileRoot, '\u63a5\u5355\u53f0'); fs.mkdirSync(dataDir, { recursive: true });
 const checks = [], pageErrors = [];
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
@@ -125,7 +126,8 @@ async function launch() {
   });
   await api('navigate');
   await desktop.close(); desktop = null;
-  await check('settings and independent login sessions survive restarting the app', async () => {
+  dataDir = require('../src/profile.cjs').prepareProfile(profileRoot, 'win32');
+  await check('settings and independent login sessions survive migrating the profile and restarting', async () => {
     await launch();
     assert.match(await guest(sites[0].id, 'document.cookie'), /account=A/);
     assert.match(await guest(sites[1].id, 'document.cookie'), /account=B/);
